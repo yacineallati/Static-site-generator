@@ -1,27 +1,36 @@
 import os
 import shutil
 from utils import *
+import sys
+
+public_path = "./docs"
+static_path = "./static"
+content_path = "./content"
+template_path = "./template.html"
+base_path = "./"
+
 
 def main():
-    public_path = "./public"
-    static_path = "./static"
-    content_path = "./content"
-    template_path = "./template.html"
+    if len(sys.argv) > 2:
+        print("Usage: python3 main.py <baseline_path>")
+        sys.exit(1)
+    if len(sys.argv) == 2:
+        base_path = sys.argv[1]
     if os.path.exists(public_path):
-        list = os.listdir(public_path)
-        for file in list:
-             path = os.path.join(public_path, file)
-             if os.path.isfile(path):
-                 os.remove(path)
+        items = os.listdir(public_path)
+        for file in items:
+            path = os.path.join(public_path, file)
+            if os.path.isfile(path):
+                os.remove(path)
         copy_files(static_path, public_path)
-        generate_page(content_path, template_path, public_path)
+        destination_public_path = os.path.join(base_path, public_path)
+        generate_page(content_path, template_path, destination_public_path)
     else: 
         os.mkdir(public_path)
         copy_files(static_path, public_path)
         generate_page(content_path, template_path, public_path)
 
 
-        
 def copy_files(source_path, dest_path):
     items = os.listdir(source_path)
     for item in items:
@@ -41,10 +50,8 @@ def generate_page(src_path, template_path, dest_path):
     items = os.listdir(src_path)
     for item in items:
         source_item_path = os.path.join(src_path, item)
-        # If it's a file, process it
         if os.path.isfile(source_item_path):
             filename, ext = os.path.splitext(item)
-            # If it's a markdown file, convert it to HTML
             if ext.lower() in ['.md', '.markdown']:
                 with open(source_item_path, 'r', encoding='utf-8') as file:
                     markdown_content = file.read()
@@ -55,21 +62,21 @@ def generate_page(src_path, template_path, dest_path):
                 body = markdown_to_html_node(markdown_content)
                 template_content = template_content.replace("{{ Title }}", title)
                 template_content = template_content.replace("{{ Content }}", body)
+                template_content = template_content.replace(' href="/' , f'href="{base_path}')
+                template_content = template_content.replace('src="/', f'src="{base_path}')
                 
-                # Set the output file in dest_path using the html filename
                 output_file = os.path.join(dest_path, f"{filename}.html")
                 os.makedirs(dest_path, exist_ok=True)
                 with open(output_file, 'w', encoding='utf-8') as file:
                     file.write(template_content)
             else:
-                # For non-markdown files, simply copy them
                 os.makedirs(dest_path, exist_ok=True)
                 shutil.copy2(source_item_path, os.path.join(dest_path, item))
         else:
-            # If it's a directory, create the corresponding directory in dest_path and process recursively
             new_dest_path = os.path.join(dest_path, item)
             os.makedirs(new_dest_path, exist_ok=True)
             generate_page(source_item_path, template_path, new_dest_path)
+
 
 if __name__ == "__main__":
     main()
