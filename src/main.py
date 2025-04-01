@@ -11,11 +11,14 @@ base_path = ""
 
 
 def main():
+    global base_path
     if len(sys.argv) > 2:
         print("Usage: python3 main.py <baseline_path>")
         sys.exit(1)
     if len(sys.argv) == 2:
         base_path = sys.argv[1]
+        if base_path == "/":
+            base_path = ""
     print(base_path)
     destination_public_path = os.path.join(base_path, public_path)
     if os.path.exists(destination_public_path):
@@ -26,7 +29,7 @@ def main():
                 os.remove(path)
         copy_files(static_path, destination_public_path)
         generate_page(content_path, template_path, destination_public_path)
-    else: 
+    else:
         os.makedirs(destination_public_path, exist_ok=True)
         copy_files(static_path, destination_public_path)
         generate_page(content_path, template_path, destination_public_path)
@@ -37,7 +40,7 @@ def copy_files(source_path, dest_path):
     for item in items:
         source_item_path = os.path.join(source_path, item)
         dest_item_path = os.path.join(dest_path, item)
-        
+
         if os.path.isfile(source_item_path):
             shutil.copy2(source_item_path, dest_item_path)
         else:
@@ -63,9 +66,9 @@ def generate_page(src_path, template_path, dest_path):
                 body = markdown_to_html_node(markdown_content)
                 template_content = template_content.replace("{{ Title }}", title)
                 template_content = template_content.replace("{{ Content }}", body)
-                template_content = template_content.replace(' href="/' , f'href="{base_path}')
+                template_content = template_content.replace('href="/', f'href="{base_path}')
                 template_content = template_content.replace('src="/', f'src="{base_path}')
-                
+
                 output_file = os.path.join(dest_path, f"{filename}.html")
                 os.makedirs(dest_path, exist_ok=True)
                 with open(output_file, 'w', encoding='utf-8') as file:
