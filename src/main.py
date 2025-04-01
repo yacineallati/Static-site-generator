@@ -19,20 +19,18 @@ def main():
         base_path = sys.argv[1]
         if base_path == "/":
             base_path = ""
-    print(base_path)
-    destination_public_path = os.path.join(base_path, public_path)
-    if os.path.exists(destination_public_path):
-        items = os.listdir(destination_public_path)
+    if os.path.exists(public_path):
+        items = os.listdir(public_path)
         for file in items:
-            path = os.path.join(destination_public_path, file)
+            path = os.path.join(public_path, file)
             if os.path.isfile(path):
                 os.remove(path)
-        copy_files(static_path, destination_public_path)
-        generate_page(content_path, template_path, destination_public_path)
+        copy_files(static_path, public_path)
+        generate_page(content_path, template_path, public_path)
     else:
-        os.makedirs(destination_public_path, exist_ok=True)
-        copy_files(static_path, destination_public_path)
-        generate_page(content_path, template_path, destination_public_path)
+        os.makedirs(public_path, exist_ok=True)
+        copy_files(static_path, public_path)
+        generate_page(content_path, template_path, public_path)
 
 
 def copy_files(source_path, dest_path):
