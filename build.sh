@@ -1,1 +1,1 @@
-python3 src/main.py "./Static-site-generator/"
+python3 src/main.py "Static-site-generator/"

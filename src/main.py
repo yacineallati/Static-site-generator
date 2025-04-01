@@ -3,11 +3,11 @@ import shutil
 from utils import *
 import sys
 
-public_path = "./docs"
-static_path = "./static"
-content_path = "./content"
-template_path = "./template.html"
-base_path = "./"
+public_path = "docs"
+static_path = "static"
+content_path = "content"
+template_path = "template.html"
+base_path = ""
 
 
 def main():
@@ -16,19 +16,20 @@ def main():
         sys.exit(1)
     if len(sys.argv) == 2:
         base_path = sys.argv[1]
-    if os.path.exists(public_path):
-        items = os.listdir(public_path)
+    print(base_path)
+    destination_public_path = os.path.join(base_path, public_path)
+    if os.path.exists(destination_public_path):
+        items = os.listdir(destination_public_path)
         for file in items:
-            path = os.path.join(public_path, file)
+            path = os.path.join(destination_public_path, file)
             if os.path.isfile(path):
                 os.remove(path)
-        copy_files(static_path, public_path)
-        destination_public_path = os.path.join(base_path, public_path)
+        copy_files(static_path, destination_public_path)
         generate_page(content_path, template_path, destination_public_path)
     else: 
-        os.mkdir(public_path)
-        copy_files(static_path, public_path)
-        generate_page(content_path, template_path, public_path)
+        os.makedirs(destination_public_path, exist_ok=True)
+        copy_files(static_path, destination_public_path)
+        generate_page(content_path, template_path, destination_public_path)
 
 
 def copy_files(source_path, dest_path):
@@ -41,7 +42,7 @@ def copy_files(source_path, dest_path):
             shutil.copy2(source_item_path, dest_item_path)
         else:
             if not os.path.exists(dest_item_path):
-                os.makedirs(dest_item_path)
+                os.makedirs(dest_item_path, exist_ok=True)
             copy_files(source_item_path, dest_item_path)
 
 
