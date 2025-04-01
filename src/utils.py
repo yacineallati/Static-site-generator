@@ -163,7 +163,7 @@ def text_node_to_html(node: TextNode):
         TextType.ITALIC: LeafNode("i", node.text),
         TextType.CODE: LeafNode("code", node.text),
         TextType.LINK: LeafNode("a", node.text, f"href={node.url}"),
-        TextType.IMAGE: LeafNode("img", "", f"src ={node.url} alt={node.text}")
+        TextType.IMAGE: LeafNode("img", "", f"src={node.url} alt={node.text}")
     }
     
     return html_map.get(node.text_type)
